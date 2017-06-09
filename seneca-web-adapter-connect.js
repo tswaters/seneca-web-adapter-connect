@@ -12,7 +12,13 @@ module.exports = function connect (options, context, auth, routes, done) {
     return done(new Error('no context provided'))
   }
 
+  const logger = seneca.log.hasOwnProperty(options.loglevel)
+    ? seneca.log[options.loglevel]
+    : () => {}
+
   _.each(routes, (route) => {
+    logger(`Mounting ${route.methods.join(', ')}: ${route.path}`)
+
     context.use(route.path, (request, reply, next) => {
       // Connect does not work with http verbs
       if (route.methods.indexOf(request.method) !== -1) {
